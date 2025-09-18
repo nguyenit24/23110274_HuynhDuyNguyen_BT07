@@ -22,7 +22,7 @@ public class CategoryEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long CategoryId;
 
-	@Column(name = "category_name", length = 100, nullable = false, columnDefinition = "nvarchar(200) not null")
+	@Column(name = "category_name", length = 100, columnDefinition = "nvarchar(200) not null")
 	private String name;
 
 	@OneToMany(mappedBy = "category",cascade = CascadeType.ALL)

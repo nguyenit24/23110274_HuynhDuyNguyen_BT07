@@ -5,6 +5,15 @@
 
 <section class="row" layout:fragment="content">
     <div class="col mt-4">
+    	<div class="mb-3">
+    	    <form th:action="@{/admin/categories/search}">
+    			<div class="input-group">
+    				<input type="text" class="form-control ml-2" id="name" name="name" placeholder="Nhập từ khóa để tìm"/>
+    				<button class="btn btn-outline-primary ml-2">Search</button>
+    			</div>
+    		</form>
+    	</div>
+    	
         <div class="card">
             <div class="card-header">List Category</div>
             <div class="card-body">

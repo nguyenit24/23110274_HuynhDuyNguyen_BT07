@@ -1,9 +1,12 @@
 package vn.iot.controller;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
@@ -15,8 +18,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import ch.qos.logback.core.joran.util.beans.BeanUtil;
-import ch.qos.logback.core.model.Model;
 import vn.iot.enity.CategoryEntity;
 import vn.iot.model.CategoryModel;
 import vn.iot.service.ICategoryService;
@@ -74,11 +75,48 @@ public class CategoryController {
 		model.addAttribute("message", "Category was deleted");
 		return "forward:/admin/categories";
 	}
-	
-//	@GetMapping("/search")
-//	public String search(ModelMap model, @RequestParam(name = "name", required = false) String name) {
-//		
-//	
-//	}
-//	
+	@GetMapping("/search")
+	public String search(ModelMap model,@RequestParam(name = "name", required = false) String name) {
+		List<CategoryEntity> list = null;
+		if(name != null) {
+			list = categoryService.findByNameContaining(name);
+		}else {
+			list = categoryService.findAll();
+		}
+		model.addAttribute("categories", list);
+		return "admin/category/search";
+	}
+	@RequestMapping("/searchpaginated")
+	public String search(ModelMap model,
+	        @RequestParam(name = "name", required = false) String name,
+	        @RequestParam("page") Optional<Integer> page,
+	        @RequestParam("size") Optional<Integer> size) {
+
+	    int currentPage = page.orElse(1);   
+	    int pageSize = size.orElse(5);     
+
+	    Pageable pageable = PageRequest.of(currentPage - 1, pageSize);
+
+	    Page<CategoryEntity> categoryPage;
+
+	    if (name != null && !name.isEmpty()) {
+	        categoryPage = categoryService.findByNameContaining(name, pageable);
+	    } else {
+	        categoryPage = categoryService.findAll(pageable);
+	    }
+
+	    int totalPages = categoryPage.getTotalPages();
+	    List<Integer> pageNumbers = new ArrayList<>();
+	    if (totalPages > 0) {
+	        for (int i = 1; i <= totalPages; i++) {
+	            pageNumbers.add(i);
+	        }
+	    }
+
+	    model.addAttribute("categoryPage", categoryPage);
+	    model.addAttribute("pageNumbers", pageNumbers);
+	    model.addAttribute("name", name);
+
+	    return "admin/category/searchpaging";
+	}
 }
